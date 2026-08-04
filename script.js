@@ -231,8 +231,6 @@ function handleNoAttempt(e) {
   if (e.cancelable) e.preventDefault();
   showRandomMessage();
   dodgeNoButton();
-  // Occasionally swap positions with the Yes button
-  if (Math.random() < 0.3) swapWithYesButton();
 }
 
 function showRandomMessage() {
@@ -307,47 +305,6 @@ function moveNoButton() {
     ],
     { duration: 400, easing: 'ease-out' }
   );
-}
-
-// Occasionally (timer-based) swap No button position with Yes button
-setInterval(() => {
-  if (!WANDER_ENABLED() || !noBtnPositioned) return;
-  if (Math.random() < 0.4) swapWithYesButton();
-}, 6000);
-
-function swapWithYesButton() {
-  const groupRect = btnGroup.getBoundingClientRect();
-  const noRect = noBtn.getBoundingClientRect();
-  const yesRect = yesBtn.getBoundingClientRect();
-
-  const noCenterX = noRect.left - groupRect.left + noRect.width / 2;
-  const noCenterY = noRect.top - groupRect.top + noRect.height / 2;
-
-  const yesCenterX = yesRect.left - groupRect.left + yesRect.width / 2;
-  const yesCenterY = yesRect.top - groupRect.top + yesRect.height / 2;
-
-  if (!noBtnPositioned) {
-    noBtn.style.position = 'absolute';
-    noBtn.style.transform = 'translate(-50%, -50%)';
-    noBtnPositioned = true;
-  }
-
-  noBtn.style.left = yesCenterX + 'px';
-  noBtn.style.top = yesCenterY + 'px';
-
-  // Animate Yes to wherever No was (only if Yes isn't absolute yet)
-  if (yesBtn.style.position !== 'absolute') {
-    yesBtn.animate(
-      [
-        { offset: 0, transform: `translate(0, 0)` },
-        { offset: 1, transform: `translate(${noCenterX - yesCenterX}px, ${noCenterY - yesCenterY}px)` }
-      ],
-      { duration: 500, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)', fill: 'forwards' }
-    );
-  }
-
-  noMoveCountdown = 3;
-  showRandomMessage();
 }
 
 /* ============================================================
