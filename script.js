@@ -86,21 +86,25 @@ function getRandomFrom(arr) {
 ============================================================ */
 let musicStarted = false;
 
-// Attempt to autoplay music once the user interacts with page
+// Attempt to autoplay music when the user interacts with the page.
+// Mobile browsers block autoplay until a user gesture, so we keep
+// trying on EVERY tap until the audio successfully starts.
 function tryPlayMusic() {
   if (musicStarted) return;
+  // Pre-load the audio so play() starts quickly on the first tap.
+  if (bgMusic.readyState < 2) bgMusic.load();
   bgMusic.play().then(() => {
     musicStarted = true;
     musicToggle.classList.add('playing');
     musicToggle.querySelector('.music-label').textContent = 'Playing';
   }).catch(() => {
-    // Browser blocked autoplay — the user can tap the music button.
+    // Browser blocked autoplay — it will retry on the next tap.
   });
 }
 
-// Start music on first interaction (click / touch / keydown)
-['click', 'touchstart', 'keydown'].forEach((evt) => {
-  window.addEventListener(evt, tryPlayMusic, { once: true });
+// Start music on any user interaction (this retries until it works)
+['click', 'touchstart', 'touchend', 'pointerdown', 'keydown'].forEach((evt) => {
+  window.addEventListener(evt, tryPlayMusic);
 });
 
 // Music toggle button
